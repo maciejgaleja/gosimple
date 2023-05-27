@@ -8,9 +8,9 @@ import (
 )
 
 func DoTestKeyValue(t *testing.T, k func() keyvalue.Store) {
-	// keyvalueTestExists(t, k())
-	// keyvalueTestSetGet(t, k())
-	// keyvalueTestList(t, k())
+	keyvalueTestExists(t, k())
+	keyvalueTestSetGet(t, k())
+	keyvalueTestList(t, k())
 	keyvalueTestComplexType(t, k())
 }
 
