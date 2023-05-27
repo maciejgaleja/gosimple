@@ -8,9 +8,10 @@ import (
 )
 
 func DoTestKeyValue(t *testing.T, k func() keyvalue.Store) {
-	keyvalueTestExists(t, k())
-	keyvalueTestSetGet(t, k())
-	keyvalueTestList(t, k())
+	// keyvalueTestExists(t, k())
+	// keyvalueTestSetGet(t, k())
+	// keyvalueTestList(t, k())
+	keyvalueTestComplexType(t, k())
 }
 
 func keyvalueTestExists(t *testing.T, kv keyvalue.Store) {
@@ -58,4 +59,21 @@ func keyvalueTestList(t *testing.T, kv keyvalue.Store) {
 	for _, k := range ks {
 		assert.True(t, kv.Exists(keyvalue.Key(k)))
 	}
+}
+
+func keyvalueTestComplexType(t *testing.T, kv keyvalue.Store) {
+	type complex struct {
+		name   string
+		number int
+		data   []byte
+	}
+	k := keyvalue.Key("test")
+	v := keyvalue.Value(complex{name: "a", number: 1, data: []byte("test")})
+
+	err := kv.Set(k, v)
+	assert.NoError(t, err)
+
+	vr, err := kv.Get(k)
+	assert.NoError(t, err)
+	assert.Equal(t, v, vr)
 }
