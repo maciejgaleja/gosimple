@@ -17,8 +17,19 @@ const (
 	metadataKeyPrefix = "user.metadata."
 )
 
+var ErrIncompatibleFilesystem = fmt.Errorf("incompatible filesystem")
+
 type FilesystemStore struct {
 	Root types.DirectoryPath
+}
+
+func NewFilesystemStore(root types.DirectoryPath) (s FilesystemStore, err error) {
+	s.Root = root
+	c := s.IsCompatibleFilesystem()
+	if !c {
+		err = ErrIncompatibleFilesystem
+	}
+	return
 }
 
 func (s FilesystemStore) IsCompatibleFilesystem() bool {
