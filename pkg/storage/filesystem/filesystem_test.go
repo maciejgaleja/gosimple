@@ -27,7 +27,7 @@ func cleanup(rootPath types.DirectoryPath) {
 func TestFilesystem(t *testing.T) {
 	fs, err := filesystem.NewFilesystemStore(rootPath)
 	assert.NoError(t, err)
-	test.DoTest(t, fs, func() { cleanup(rootPath) })
+	test.DoTestStorage(t, fs, func() { cleanup(rootPath) })
 }
 
 func TestReadOnly(t *testing.T) {
