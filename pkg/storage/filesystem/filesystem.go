@@ -82,6 +82,14 @@ func (s FilesystemStore) Create(h storage.Key) (io.WriteCloser, error) {
 	return os.Create(pth)
 }
 
+func (s FilesystemStore) Delete(h storage.Key) error {
+	if !s.Exists(h) {
+		return fmt.Errorf("object does not exist")
+	}
+	pth := filepath.Join(string(s.Root), string(h))
+	return os.Remove(pth)
+}
+
 func (s FilesystemStore) Writer(h storage.Key) (io.WriteCloser, error) {
 	if !s.Exists(h) {
 		return nil, fmt.Errorf("object does not exist")

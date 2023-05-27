@@ -9,7 +9,7 @@ import (
 
 func DoTestStorage(t *testing.T, s storage.Storage, cleanup func()) {
 	cleanup()
-	storageTestCreate(t, s)
+	storageTestCreateDelete(t, s)
 
 	cleanup()
 	storageTestWriterReader(t, s)
@@ -21,7 +21,7 @@ func DoTestStorage(t *testing.T, s storage.Storage, cleanup func()) {
 	storageTestList(t, s)
 }
 
-func storageTestCreate(t *testing.T, s storage.Storage) {
+func storageTestCreateDelete(t *testing.T, s storage.Storage) {
 	k := storage.Key("test")
 
 	e := s.Exists(k)
@@ -35,6 +35,12 @@ func storageTestCreate(t *testing.T, s storage.Storage) {
 
 	_, err = s.Create(k)
 	assert.Error(t, err)
+
+	err = s.Delete(k)
+	assert.NoError(t, err)
+
+	e = s.Exists(k)
+	assert.False(t, e)
 }
 
 func storageTestWriterReader(t *testing.T, s storage.Storage) {
