@@ -7,21 +7,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func DoTest(t *testing.T, s storage.Storage, cleanup func()) {
+func DoTestStorage(t *testing.T, s storage.Storage, cleanup func()) {
 	cleanup()
-	doTestCreate(t, s)
+	storageTestCreate(t, s)
 
 	cleanup()
-	doTestWriterReader(t, s)
+	storageTestWriterReader(t, s)
 
 	cleanup()
-	doTestMetadata(t, s)
+	storageTestMetadata(t, s)
 
 	cleanup()
-	doTestList(t, s)
+	storageTestList(t, s)
 }
 
-func doTestCreate(t *testing.T, s storage.Storage) {
+func storageTestCreate(t *testing.T, s storage.Storage) {
 	k := storage.Key("test")
 
 	e := s.Exists(k)
@@ -37,7 +37,7 @@ func doTestCreate(t *testing.T, s storage.Storage) {
 	assert.Error(t, err)
 }
 
-func doTestWriterReader(t *testing.T, s storage.Storage) {
+func storageTestWriterReader(t *testing.T, s storage.Storage) {
 	k := storage.Key("test")
 	d := []byte("test")
 
@@ -76,7 +76,7 @@ func doTestWriterReader(t *testing.T, s storage.Storage) {
 	assert.NoError(t, err)
 }
 
-func doTestMetadata(t *testing.T, s storage.Storage) {
+func storageTestMetadata(t *testing.T, s storage.Storage) {
 	k := storage.Key("test")
 	mk := storage.MetadataKey("test")
 	md := storage.MetadataValue("test")
@@ -104,7 +104,7 @@ func doTestMetadata(t *testing.T, s storage.Storage) {
 	assert.Equal(t, md, mdr)
 }
 
-func doTestList(t *testing.T, s storage.Storage) {
+func storageTestList(t *testing.T, s storage.Storage) {
 	k := storage.Key("test")
 
 	l, err := s.List()
