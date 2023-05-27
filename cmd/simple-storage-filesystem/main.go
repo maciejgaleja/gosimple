@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/maciejgaleja/gosimple/pkg/authenticator"
 	"github.com/maciejgaleja/gosimple/pkg/keyvalue/json"
@@ -24,7 +22,6 @@ func NewAuthenticator() (*authenticator.Authenticator, error) {
 }
 
 func main() {
-	fmt.Println("Hello, world")
 	s, err := filesystem.NewFilesystemStore(storageDir)
 	if err != nil {
 		panic(err)
