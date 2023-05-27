@@ -59,6 +59,11 @@ func (s FilesystemStore) IsCompatibleFilesystem() bool {
 		return false
 	}
 
+	err = os.Remove(pth)
+	if err != nil {
+		return false
+	}
+
 	return string(rv) == string(v)
 }
 

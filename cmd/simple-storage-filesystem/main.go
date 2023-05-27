@@ -3,13 +3,16 @@ package main
 import (
 	"fmt"
 
+	"github.com/gin-gonic/gin"
 	"github.com/maciejgaleja/gosimple/pkg/authenticator"
-	"github.com/maciejgaleja/gosimple/pkg/hash"
 	"github.com/maciejgaleja/gosimple/pkg/keyvalue/json"
+	"github.com/maciejgaleja/gosimple/pkg/server/storage"
+	"github.com/maciejgaleja/gosimple/pkg/storage/filesystem"
 )
 
 const (
-	dbFile = "./workspace/authenticator.json"
+	dbFile     = "./workspace/authenticator.json"
+	storageDir = "./workspace/storage/"
 )
 
 func NewAuthenticator() (*authenticator.Authenticator, error) {
@@ -22,16 +25,14 @@ func NewAuthenticator() (*authenticator.Authenticator, error) {
 
 func main() {
 	fmt.Println("Hello, world")
-	a, err := NewAuthenticator()
+	s, err := filesystem.NewFilesystemStore(storageDir)
 	if err != nil {
 		panic(err)
 	}
 
-	err = a.Register(authenticator.Entry{authenticator.HashedUsername(hash.HashString("user")), authenticator.HashedPassword(hash.HashString("password"))})
+	ss := storage.NewStorageApi(s)
 
-	b, err := a.Verify(authenticator.Entry{authenticator.HashedUsername(hash.HashString("usesr")), authenticator.HashedPassword(hash.HashString("password"))})
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(b)
+	g := gin.Default()
+	ss.RegisterToGin(g, "objects")
+	g.Run("0.0.0.0:8080")
 }
