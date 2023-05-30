@@ -4,16 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 
 	"github.com/maciejgaleja/gosimple/pkg/storage"
 	"github.com/maciejgaleja/gosimple/pkg/types"
-	"github.com/pkg/xattr"
 )
-
-var ErrIncompatibleFilesystem = fmt.Errorf("incompatible filesystem")
 
 type FilesystemStore struct {
 	Root types.DirectoryPath
@@ -21,46 +17,7 @@ type FilesystemStore struct {
 
 func NewFilesystemStore(root types.DirectoryPath) (s FilesystemStore, err error) {
 	s.Root = root
-	c := s.IsCompatibleFilesystem()
-	if !c {
-		err = ErrIncompatibleFilesystem
-	}
 	return
-}
-
-func (s FilesystemStore) IsCompatibleFilesystem() bool {
-	log.Printf("Checking filesystem for %v", s)
-
-	k := "user.compatibilityCheck"
-	v := []byte("test")
-
-	pth := filepath.Join(string(s.Root), "compatibilityCheck")
-	f, err := os.Create(pth)
-	if err != nil {
-		return false
-	}
-
-	_, err = f.Write([]byte("Compatibility check for store"))
-	if err != nil {
-		return false
-	}
-
-	err = xattr.FSet(f, "user.compatibilityCheck", v)
-	if err != nil {
-		return false
-	}
-
-	rv, err := xattr.FGet(f, k)
-	if err != nil {
-		return false
-	}
-
-	err = os.Remove(pth)
-	if err != nil {
-		return false
-	}
-
-	return string(rv) == string(v)
 }
 
 func (s FilesystemStore) Exists(h storage.Key) bool {
