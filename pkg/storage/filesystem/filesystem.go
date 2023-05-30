@@ -13,10 +13,6 @@ import (
 	"github.com/pkg/xattr"
 )
 
-const (
-	metadataKeyPrefix = "user.metadata."
-)
-
 var ErrIncompatibleFilesystem = fmt.Errorf("incompatible filesystem")
 
 type FilesystemStore struct {
@@ -106,26 +102,6 @@ func (s FilesystemStore) Reader(h storage.Key) (io.ReadSeekCloser, error) {
 
 	pth := filepath.Join(string(s.Root), string(h))
 	return os.Open(pth)
-}
-
-func (s FilesystemStore) SetMetadata(h storage.Key, k storage.MetadataKey, v storage.MetadataValue) error {
-	if !s.Exists(h) {
-		return fmt.Errorf("object does not exist")
-	}
-	metadataKey := metadataKeyPrefix + k
-	pth := filepath.Join(string(s.Root), string(h))
-	return xattr.Set(pth, string(metadataKey), v)
-}
-
-func (s FilesystemStore) GetMetadata(h storage.Key, k storage.MetadataKey) (storage.MetadataValue, error) {
-	if !s.Exists(h) {
-		return []byte{}, fmt.Errorf("object does not exist")
-	}
-
-	metadataKey := metadataKeyPrefix + k
-
-	pth := filepath.Join(string(s.Root), string(h))
-	return xattr.Get(pth, string(metadataKey))
 }
 
 func (s FilesystemStore) List() ([]storage.Key, error) {

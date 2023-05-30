@@ -15,9 +15,6 @@ func DoTestStorage(t *testing.T, s storage.Storage, cleanup func()) {
 	storageTestWriterReader(t, s)
 
 	cleanup()
-	storageTestMetadata(t, s)
-
-	cleanup()
 	storageTestList(t, s)
 }
 
@@ -80,34 +77,6 @@ func storageTestWriterReader(t *testing.T, s storage.Storage) {
 
 	err = r.Close()
 	assert.NoError(t, err)
-}
-
-func storageTestMetadata(t *testing.T, s storage.Storage) {
-	k := storage.Key("test")
-	mk := storage.MetadataKey("test")
-	md := storage.MetadataValue("test")
-
-	err := s.SetMetadata(k, mk, md)
-	assert.Error(t, err)
-
-	_, err = s.GetMetadata(k, mk)
-	assert.Error(t, err)
-
-	w, err := s.Create(k)
-	assert.NoError(t, err)
-
-	err = w.Close()
-	assert.NoError(t, err)
-
-	_, err = s.GetMetadata(k, mk)
-	assert.Error(t, err)
-
-	err = s.SetMetadata(k, mk, md)
-	assert.NoError(t, err)
-
-	mdr, err := s.GetMetadata(k, mk)
-	assert.NoError(t, err)
-	assert.Equal(t, md, mdr)
 }
 
 func storageTestList(t *testing.T, s storage.Storage) {
