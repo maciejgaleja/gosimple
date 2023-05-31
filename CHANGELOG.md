@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Function for hashing various inputs (strings, buffers, files).
+- Type for file extension.
 
 ### Changed
 - Type name for hash.
