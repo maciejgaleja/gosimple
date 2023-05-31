@@ -41,7 +41,8 @@ func keyvalueTestSetGet(t *testing.T, kv keyvalue.Store) {
 	err := kv.Set(k, v)
 	assert.NoError(t, err)
 
-	vr, err := kv.Get(k)
+	var vr string
+	err = kv.Get(k, &vr)
 	assert.NoError(t, err)
 	assert.Equal(t, v, vr)
 }
@@ -63,17 +64,18 @@ func keyvalueTestList(t *testing.T, kv keyvalue.Store) {
 
 func keyvalueTestComplexType(t *testing.T, kv keyvalue.Store) {
 	type complex struct {
-		name   string
-		number int
-		data   []byte
+		Name   string
+		Number int
+		Data   []byte
 	}
 	k := keyvalue.Key("test")
-	v := keyvalue.Value(complex{name: "a", number: 1, data: []byte("test")})
+	v := keyvalue.Value(complex{Name: "a", Number: 1, Data: []byte("test")})
 
 	err := kv.Set(k, v)
 	assert.NoError(t, err)
 
-	vr, err := kv.Get(k)
+	var vr complex
+	err = kv.Get(k, &vr)
 	assert.NoError(t, err)
 	assert.Equal(t, v, vr)
 }
