@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Function for hashing various inputs (strings, buffers, files).
 
+### Changed
+- Type name for hash.
+
 ## [0.0.1] - 2023-05-30
 
 ### Added
