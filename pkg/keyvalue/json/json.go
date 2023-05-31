@@ -58,12 +58,20 @@ func (j *JsonStore) Set(k keyvalue.Key, v keyvalue.Value) error {
 	return j.sync()
 }
 
-func (j *JsonStore) Get(k keyvalue.Key) (keyvalue.Value, error) {
-	v, ok := j.d[k]
+func (j *JsonStore) Get(k keyvalue.Key, v any) error {
+	vv, ok := j.d[k]
 	if ok {
-		return v, nil
+		b, err := json.Marshal(vv)
+		if err != nil {
+			return err
+		}
+		err = json.Unmarshal(b, v)
+		if err != nil {
+			return err
+		}
+		return nil
 	} else {
-		return nil, ErrNoSuchKey(k)
+		return ErrNoSuchKey(k)
 	}
 }
 

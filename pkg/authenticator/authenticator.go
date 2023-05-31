@@ -1,8 +1,6 @@
 package authenticator
 
 import (
-	"fmt"
-
 	"github.com/maciejgaleja/gosimple/pkg/keyvalue"
 )
 
@@ -28,13 +26,10 @@ func (a *Authenticator) Register(e Entry) error {
 }
 
 func (a *Authenticator) Verify(e Entry) (bool, error) {
-	rei, err := a.db.Get(keyvalue.Key(e.Username))
+	var re Entry
+	err := a.db.Get(keyvalue.Key(e.Username), &re)
 	if err != nil {
 		return false, nil
-	}
-	re, err := keyvalue.Cast[Entry](rei)
-	if err != nil {
-		return false, fmt.Errorf("error during login verification")
 	}
 	return (re.Username == e.Username && re.Password == e.Password), nil
 }
