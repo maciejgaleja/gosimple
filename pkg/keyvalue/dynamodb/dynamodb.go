@@ -5,7 +5,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
 	awsdynamo "github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/maciejgaleja/gosimple/pkg/keyvalue"
@@ -47,7 +46,7 @@ func (d DynamoDb) Set(k keyvalue.Key, v keyvalue.Value) error {
 		return err
 	}
 
-	input := &dynamodb.PutItemInput{
+	input := &awsdynamo.PutItemInput{
 		Item:      av,
 		TableName: aws.String(d.n),
 	}
@@ -76,7 +75,7 @@ func (d DynamoDb) Get(k keyvalue.Key, v any) error {
 }
 
 func (d DynamoDb) List() ([]keyvalue.Key, error) {
-	input := &dynamodb.ScanInput{
+	input := &awsdynamo.ScanInput{
 		TableName: aws.String(d.n),
 	}
 
@@ -102,9 +101,9 @@ func (d DynamoDb) List() ([]keyvalue.Key, error) {
 }
 
 func (d DynamoDb) Remove(k keyvalue.Key) error {
-	input := &dynamodb.DeleteItemInput{
+	input := &awsdynamo.DeleteItemInput{
 		TableName: aws.String(d.n),
-		Key: map[string]*dynamodb.AttributeValue{
+		Key: map[string]*awsdynamo.AttributeValue{
 			d.k: {
 				S: aws.String(string(k)),
 			},
