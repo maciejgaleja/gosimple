@@ -19,9 +19,21 @@ func NewDynamoDb(sess *session.Session, tableName string, key string) DynamoDb {
 	return DynamoDb{d: awsdynamo.New(sess), n: tableName, k: key}
 }
 
-// func (d DynamoDb) Exists(keyvalue.Key) bool {
-
-// }
+func (d DynamoDb) Exists(k keyvalue.Key) (bool, error) {
+	ak, err := dynamodbattribute.Marshal(k)
+	if err != nil {
+		return false, err
+	}
+	input := &awsdynamo.GetItemInput{
+		TableName: aws.String(d.n),
+		Key:       map[string]*awsdynamo.AttributeValue{d.k: ak},
+	}
+	result, err := d.d.GetItem(input)
+	if err != nil {
+		return false, err
+	}
+	return result.Item != nil, nil
+}
 
 func (d DynamoDb) Set(k keyvalue.Key, v keyvalue.Value) error {
 	av, err := dynamodbattribute.MarshalMap(v)
