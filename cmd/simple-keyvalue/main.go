@@ -32,14 +32,11 @@ func main() {
 	// }
 
 	ddb := dynamodb.NewDynamoDb(sess, "gosimple-test", "key")
-	// err = ddb.Set("1", item)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	fmt.Println(ddb.Exists("0"))
-	fmt.Println(ddb.Exists("1"))
-	fmt.Println(ddb.Exists("2"))
-	fmt.Println(ddb.Exists("3"))
-	fmt.Println(ddb.Exists("4"))
-	fmt.Println(ddb.Exists("5"))
+	is, err := ddb.List()
+	if err != nil {
+		panic(err)
+	}
+	for _, i := range is {
+		fmt.Println(i)
+	}
 }

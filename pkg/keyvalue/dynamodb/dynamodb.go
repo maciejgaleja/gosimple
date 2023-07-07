@@ -1,6 +1,8 @@
 package dynamodb
 
 import (
+	"fmt"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -54,18 +56,75 @@ func (d DynamoDb) Set(k keyvalue.Key, v keyvalue.Value) error {
 	return err
 }
 
-// func (d DynamoDb) Get(keyvalue.Key, any) error {
+func (d DynamoDb) Get(k keyvalue.Key, v any) error {
+	ak, err := dynamodbattribute.Marshal(k)
+	if err != nil {
+		return err
+	}
+	input := &awsdynamo.GetItemInput{
+		TableName: aws.String(d.n),
+		Key:       map[string]*awsdynamo.AttributeValue{d.k: ak},
+	}
+	result, err := d.d.GetItem(input)
+	if err != nil {
+		return err
+	}
+	if result.Item == nil {
+		return fmt.Errorf("object with key '%s' does not exist in table '%s'", k, d.n)
+	}
+	return dynamodbattribute.UnmarshalMap(result.Item, v)
+}
 
-// }
+func (d DynamoDb) List() ([]keyvalue.Key, error) {
+	input := &dynamodb.ScanInput{
+		TableName: aws.String(d.n),
+	}
 
-// func (d DynamoDb) List() ([]keyvalue.Key, error) {
+	result, err := d.d.Scan(input)
+	if err != nil {
+		return nil, err
+	}
 
-// }
+	ret := []keyvalue.Key{}
+	for _, item := range result.Items {
+		doc := map[string]interface{}{}
+		err = dynamodbattribute.UnmarshalMap(item, &doc)
+		if err != nil {
+			return nil, err
+		}
+		ks, ok := doc[d.k].(string)
+		if !ok {
+			return nil, fmt.Errorf("one of objects in table '%s' does not contain the key named '%s'", d.n, d.k)
+		}
+		ret = append(ret, keyvalue.Key(ks))
+	}
+	return ret, nil
+}
 
-// func (d DynamoDb) Remove(keyvalue.Key) error {
+func (d DynamoDb) Remove(k keyvalue.Key) error {
+	input := &dynamodb.DeleteItemInput{
+		TableName: aws.String(d.n),
+		Key: map[string]*dynamodb.AttributeValue{
+			d.k: {
+				S: aws.String(string(k)),
+			},
+		},
+	}
 
-// }
+	_, err := d.d.DeleteItem(input)
+	return err
+}
 
-// func (d DynamoDb) Clear() error {
-
-// }
+func (d DynamoDb) Clear() error {
+	ks, err := d.List()
+	if err != nil {
+		return err
+	}
+	for _, k := range ks {
+		err = d.Remove(k)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
