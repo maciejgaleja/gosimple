@@ -8,10 +8,18 @@ import (
 )
 
 func DoTestKeyValue(t *testing.T, k func() keyvalue.Store) {
-	keyvalueTestExists(t, k())
-	keyvalueTestSetGet(t, k())
-	keyvalueTestList(t, k())
-	keyvalueTestComplexType(t, k())
+	t.Run("exists", func(t *testing.T) {
+		keyvalueTestExists(t, k())
+	})
+	t.Run("setGet", func(t *testing.T) {
+		keyvalueTestSetGet(t, k())
+	})
+	t.Run("list", func(t *testing.T) {
+		keyvalueTestList(t, k())
+	})
+	t.Run("complexType", func(t *testing.T) {
+		keyvalueTestComplexType(t, k())
+	})
 }
 
 func keyvalueTestExists(t *testing.T, kv keyvalue.Store) {

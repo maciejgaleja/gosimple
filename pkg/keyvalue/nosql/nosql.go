@@ -1,4 +1,4 @@
-package dynamodb
+package nosql
 
 import (
 	"encoding/json"
@@ -8,21 +8,21 @@ import (
 	"github.com/maciejgaleja/gosimple/pkg/nosql"
 )
 
-type DynamoDb struct {
+type NoSql struct {
 	db nosql.Store
 	k  nosql.PrimaryKey
 	v  string
 }
 
-func NewDynamoDb(nsql nosql.Store, keyName nosql.PrimaryKey, valueName string) DynamoDb {
-	return DynamoDb{db: nsql, k: keyName, v: valueName}
+func NewNoSql(nsql nosql.Store, keyName nosql.PrimaryKey, valueName string) NoSql {
+	return NoSql{db: nsql, k: keyName, v: valueName}
 }
 
-func (d DynamoDb) Exists(k keyvalue.Key) (bool, error) {
+func (d NoSql) Exists(k keyvalue.Key) (bool, error) {
 	return d.db.Exists(nosql.PrimaryKey(k))
 }
 
-func (d DynamoDb) Set(k keyvalue.Key, v keyvalue.Value) error {
+func (d NoSql) Set(k keyvalue.Key, v keyvalue.Value) error {
 	bs, err := json.Marshal(v)
 	if err != nil {
 		return err
@@ -33,7 +33,7 @@ func (d DynamoDb) Set(k keyvalue.Key, v keyvalue.Value) error {
 	return d.db.Set(doc)
 }
 
-func (d DynamoDb) Get(k keyvalue.Key, v any) error {
+func (d NoSql) Get(k keyvalue.Key, v any) error {
 	var doc nosql.Document
 	err := d.db.Get(nosql.PrimaryKey(k), &doc)
 	if err != nil {
@@ -46,7 +46,7 @@ func (d DynamoDb) Get(k keyvalue.Key, v any) error {
 	return json.Unmarshal(bs, v)
 }
 
-func (d DynamoDb) List() ([]keyvalue.Key, error) {
+func (d NoSql) List() ([]keyvalue.Key, error) {
 	ks, err := d.db.List()
 	if err != nil {
 		return nil, err
@@ -58,10 +58,10 @@ func (d DynamoDb) List() ([]keyvalue.Key, error) {
 	return ret, nil
 }
 
-func (d DynamoDb) Remove(k keyvalue.Key) error {
+func (d NoSql) Remove(k keyvalue.Key) error {
 	return d.db.Remove(nosql.PrimaryKey(k))
 }
 
-func (d DynamoDb) Clear() error {
+func (d NoSql) Clear() error {
 	return d.db.Clear()
 }
