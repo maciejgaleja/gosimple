@@ -20,6 +20,9 @@ func DoTestKeyValue(t *testing.T, k func() keyvalue.Store) {
 	t.Run("complexType", func(t *testing.T) {
 		keyvalueTestComplexType(t, k())
 	})
+	t.Run("clear", func(t *testing.T) {
+		keyvalueTestClear(t, k())
+	})
 }
 
 func keyvalueTestExists(t *testing.T, kv keyvalue.Store) {
@@ -91,4 +94,13 @@ func keyvalueTestComplexType(t *testing.T, kv keyvalue.Store) {
 	err = kv.Get(k, &vr)
 	assert.NoError(t, err)
 	assert.Equal(t, v, vr)
+}
+
+func keyvalueTestClear(t *testing.T, kv keyvalue.Store) {
+	err := kv.Clear()
+	assert.NoError(t, err)
+
+	ii, err := kv.List()
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(ii))
 }
