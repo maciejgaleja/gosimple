@@ -48,9 +48,9 @@ func (j *JsonStore) sync() error {
 	return os.WriteFile(string(j.f), d, 0644)
 }
 
-func (j *JsonStore) Exists(k keyvalue.Key) bool {
+func (j *JsonStore) Exists(k keyvalue.Key) (bool, error) {
 	_, ok := j.d[k]
-	return ok
+	return ok, nil
 }
 
 func (j *JsonStore) Set(k keyvalue.Key, v keyvalue.Value) error {

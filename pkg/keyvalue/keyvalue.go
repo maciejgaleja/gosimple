@@ -4,7 +4,7 @@ type Key string
 type Value any
 
 type Store interface {
-	Exists(Key) bool
+	Exists(Key) (bool, error)
 	Set(Key, Value) error
 	Get(Key, any) error
 	List() ([]Key, error)

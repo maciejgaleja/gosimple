@@ -8,29 +8,43 @@ import (
 )
 
 func DoTestKeyValue(t *testing.T, k func() keyvalue.Store) {
-	keyvalueTestExists(t, k())
-	keyvalueTestSetGet(t, k())
-	keyvalueTestList(t, k())
-	keyvalueTestComplexType(t, k())
+	t.Run("exists", func(t *testing.T) {
+		keyvalueTestExists(t, k())
+	})
+	t.Run("setGet", func(t *testing.T) {
+		keyvalueTestSetGet(t, k())
+	})
+	t.Run("list", func(t *testing.T) {
+		keyvalueTestList(t, k())
+	})
+	t.Run("complexType", func(t *testing.T) {
+		keyvalueTestComplexType(t, k())
+	})
+	t.Run("clear", func(t *testing.T) {
+		keyvalueTestClear(t, k())
+	})
 }
 
 func keyvalueTestExists(t *testing.T, kv keyvalue.Store) {
 	k := keyvalue.Key("test")
 	v := keyvalue.Value("test")
 
-	e := kv.Exists(k)
+	e, err := kv.Exists(k)
+	assert.NoError(t, err)
 	assert.False(t, e)
 
-	err := kv.Set(k, v)
+	err = kv.Set(k, v)
 	assert.NoError(t, err)
 
-	e = kv.Exists(k)
+	e, err = kv.Exists(k)
+	assert.NoError(t, err)
 	assert.True(t, e)
 
 	err = kv.Remove(k)
 	assert.NoError(t, err)
 
-	e = kv.Exists(k)
+	e, err = kv.Exists(k)
+	assert.NoError(t, err)
 	assert.False(t, e)
 }
 
@@ -58,7 +72,9 @@ func keyvalueTestList(t *testing.T, kv keyvalue.Store) {
 		assert.Equal(t, i+1, len(l))
 	}
 	for _, k := range ks {
-		assert.True(t, kv.Exists(keyvalue.Key(k)))
+		b, err := kv.Exists(keyvalue.Key(k))
+		assert.True(t, b)
+		assert.NoError(t, err)
 	}
 }
 
@@ -78,4 +94,13 @@ func keyvalueTestComplexType(t *testing.T, kv keyvalue.Store) {
 	err = kv.Get(k, &vr)
 	assert.NoError(t, err)
 	assert.Equal(t, v, vr)
+}
+
+func keyvalueTestClear(t *testing.T, kv keyvalue.Store) {
+	err := kv.Clear()
+	assert.NoError(t, err)
+
+	ii, err := kv.List()
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(ii))
 }
