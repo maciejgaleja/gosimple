@@ -1,24 +1,29 @@
 package dynamodb_test
 
 import (
-	"os"
 	"testing"
 
+	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/maciejgaleja/gosimple/pkg/keyvalue"
-	"github.com/maciejgaleja/gosimple/pkg/keyvalue/json"
+	kvdynamo "github.com/maciejgaleja/gosimple/pkg/keyvalue/dynamodb"
+	nsqldynamo "github.com/maciejgaleja/gosimple/pkg/nosql/dynamodb"
 	"github.com/maciejgaleja/gosimple/test"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestKeyValue(t *testing.T) {
 	test.DoTestKeyValue(t, func() keyvalue.Store {
-		os.MkdirAll(string(R), 0755)
-		j, err := json.NewJsonStore(F)
-		if err != nil {
-			panic(err)
-		}
-		if err := j.Clear(); err != nil {
-			panic(err)
-		}
-		return j
+		sess, err := session.NewSessionWithOptions(session.Options{
+			SharedConfigState: session.SharedConfigEnable,
+			Profile:           "default",
+		})
+		assert.NoError(t, err)
+
+		nsql := nsqldynamo.NewDynamoDb(sess, "gosimple-test", "key")
+
+		ddb := kvdynamo.NewDynamoDb(nsql, "key", "value")
+		err = ddb.Clear()
+		assert.NoError(t, err)
+		return ddb
 	})
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/maciejgaleja/gosimple/pkg/keyvalue/dynamodb"
+	"github.com/maciejgaleja/gosimple/pkg/nosql/dynamodb"
 )
 
 // Create struct to hold info about new item

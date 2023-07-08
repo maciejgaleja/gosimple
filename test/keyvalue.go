@@ -18,19 +18,22 @@ func keyvalueTestExists(t *testing.T, kv keyvalue.Store) {
 	k := keyvalue.Key("test")
 	v := keyvalue.Value("test")
 
-	e := kv.Exists(k)
+	e, err := kv.Exists(k)
+	assert.NoError(t, err)
 	assert.False(t, e)
 
-	err := kv.Set(k, v)
+	err = kv.Set(k, v)
 	assert.NoError(t, err)
 
-	e = kv.Exists(k)
+	e, err = kv.Exists(k)
+	assert.NoError(t, err)
 	assert.True(t, e)
 
 	err = kv.Remove(k)
 	assert.NoError(t, err)
 
-	e = kv.Exists(k)
+	e, err = kv.Exists(k)
+	assert.NoError(t, err)
 	assert.False(t, e)
 }
 
@@ -58,7 +61,9 @@ func keyvalueTestList(t *testing.T, kv keyvalue.Store) {
 		assert.Equal(t, i+1, len(l))
 	}
 	for _, k := range ks {
-		assert.True(t, kv.Exists(keyvalue.Key(k)))
+		b, err := kv.Exists(keyvalue.Key(k))
+		assert.True(t, b)
+		assert.NoError(t, err)
 	}
 }
 

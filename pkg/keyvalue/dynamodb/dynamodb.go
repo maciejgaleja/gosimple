@@ -1,129 +1,67 @@
 package dynamodb
 
 import (
+	"encoding/json"
 	"fmt"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	awsdynamo "github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/maciejgaleja/gosimple/pkg/keyvalue"
+	"github.com/maciejgaleja/gosimple/pkg/nosql"
 )
 
 type DynamoDb struct {
-	d *awsdynamo.DynamoDB
-	n string
-	k string
+	db nosql.Store
+	k  nosql.PrimaryKey
+	v  string
 }
 
-func NewDynamoDb(sess *session.Session, tableName string, key string) DynamoDb {
-	return DynamoDb{d: awsdynamo.New(sess), n: tableName, k: key}
+func NewDynamoDb(nsql nosql.Store, keyName nosql.PrimaryKey, valueName string) DynamoDb {
+	return DynamoDb{db: nsql, k: keyName, v: valueName}
 }
 
 func (d DynamoDb) Exists(k keyvalue.Key) (bool, error) {
-	ak, err := dynamodbattribute.Marshal(k)
-	if err != nil {
-		return false, err
-	}
-	input := &awsdynamo.GetItemInput{
-		TableName: aws.String(d.n),
-		Key:       map[string]*awsdynamo.AttributeValue{d.k: ak},
-	}
-	result, err := d.d.GetItem(input)
-	if err != nil {
-		return false, err
-	}
-	return result.Item != nil, nil
+	return d.db.Exists(nosql.PrimaryKey(k))
 }
 
 func (d DynamoDb) Set(k keyvalue.Key, v keyvalue.Value) error {
-	av, err := dynamodbattribute.MarshalMap(v)
+	bs, err := json.Marshal(v)
 	if err != nil {
 		return err
 	}
-	av[d.k], err = dynamodbattribute.Marshal(k)
-	if err != nil {
-		return err
-	}
-
-	input := &awsdynamo.PutItemInput{
-		Item:      av,
-		TableName: aws.String(d.n),
-	}
-
-	_, err = d.d.PutItem(input)
-	return err
+	doc := nosql.Document{}
+	doc[string(d.k)] = k
+	doc[d.v] = bs
+	return d.db.Set(doc)
 }
 
 func (d DynamoDb) Get(k keyvalue.Key, v any) error {
-	ak, err := dynamodbattribute.Marshal(k)
+	var doc nosql.Document
+	err := d.db.Get(nosql.PrimaryKey(k), &doc)
 	if err != nil {
 		return err
 	}
-	input := &awsdynamo.GetItemInput{
-		TableName: aws.String(d.n),
-		Key:       map[string]*awsdynamo.AttributeValue{d.k: ak},
+	bs, ok := doc[d.v].([]byte)
+	if !ok {
+		return fmt.Errorf("error while parsing value of key '%s'", k)
 	}
-	result, err := d.d.GetItem(input)
-	if err != nil {
-		return err
-	}
-	if result.Item == nil {
-		return fmt.Errorf("object with key '%s' does not exist in table '%s'", k, d.n)
-	}
-	return dynamodbattribute.UnmarshalMap(result.Item, v)
+	return json.Unmarshal(bs, v)
 }
 
 func (d DynamoDb) List() ([]keyvalue.Key, error) {
-	input := &awsdynamo.ScanInput{
-		TableName: aws.String(d.n),
-	}
-
-	result, err := d.d.Scan(input)
+	ks, err := d.db.List()
 	if err != nil {
 		return nil, err
 	}
-
-	ret := []keyvalue.Key{}
-	for _, item := range result.Items {
-		doc := map[string]interface{}{}
-		err = dynamodbattribute.UnmarshalMap(item, &doc)
-		if err != nil {
-			return nil, err
-		}
-		ks, ok := doc[d.k].(string)
-		if !ok {
-			return nil, fmt.Errorf("one of objects in table '%s' does not contain the key named '%s'", d.n, d.k)
-		}
-		ret = append(ret, keyvalue.Key(ks))
+	ret := make([]keyvalue.Key, len(ks))
+	for i, k := range ks {
+		ret[i] = keyvalue.Key(k)
 	}
 	return ret, nil
 }
 
 func (d DynamoDb) Remove(k keyvalue.Key) error {
-	input := &awsdynamo.DeleteItemInput{
-		TableName: aws.String(d.n),
-		Key: map[string]*awsdynamo.AttributeValue{
-			d.k: {
-				S: aws.String(string(k)),
-			},
-		},
-	}
-
-	_, err := d.d.DeleteItem(input)
-	return err
+	return d.db.Remove(nosql.PrimaryKey(k))
 }
 
 func (d DynamoDb) Clear() error {
-	ks, err := d.List()
-	if err != nil {
-		return err
-	}
-	for _, k := range ks {
-		err = d.Remove(k)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
+	return d.db.Clear()
 }
