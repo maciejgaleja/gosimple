@@ -51,7 +51,7 @@ func (d DynamoDb) Set(doc nosql.Document) error {
 	return err
 }
 
-func (d DynamoDb) Get(k nosql.PrimaryKey, doc *nosql.Document) error {
+func (d DynamoDb) Get(k nosql.PrimaryKey, doc interface{}) error {
 	ak, err := dynamodbattribute.Marshal(k)
 	if err != nil {
 		return err
