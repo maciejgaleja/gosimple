@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.4] - 2023-07-09
+### Changed
+- Get type for NoSQL.
+
+## [0.0.3] - 2023-07-08
+### Added
+- Interface for NoSQL.
+- Implementation for NoSQL using AWS DynamoDb.
+- Implementation for KeyValue using NoSQL.
+
 ## [0.0.2] - 2023-05-31
 ### Added
 - Function for hashing various inputs (strings, buffers, files).
@@ -27,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - This CHANGELOG file to hopefully serve as an evolving example of a
   standardized open source project CHANGELOG.
 
-[unreleased]: https://github.com/maciejgaleja/gosimple/compare/v0.0.2...HEAD
+[unreleased]: https://github.com/maciejgaleja/gosimple/compare/v0.0.4...HEAD
+[0.0.4]: https://github.com/maciejgaleja/gosimple/compare/v0.0.4...v0.0.4
+[0.0.3]: https://github.com/maciejgaleja/gosimple/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/maciejgaleja/gosimple/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/maciejgaleja/gosimple/releases/tag/v0.0.1
