@@ -8,14 +8,30 @@ import (
 )
 
 func DoTestStorage(t *testing.T, s storage.Storage, cleanup func()) {
-	cleanup()
-	storageTestCreateDelete(t, s)
+	t.Run("CreateDelete", func(t *testing.T) {
+		cleanup()
+		storageTestCreateDelete(t, s)
+	})
 
-	cleanup()
-	storageTestWriterReader(t, s)
+	t.Run("WriterReader", func(t *testing.T) {
+		cleanup()
+		storageTestWriterReader(t, s)
+	})
 
-	cleanup()
-	storageTestList(t, s)
+	t.Run("List", func(t *testing.T) {
+		cleanup()
+		storageTestList(t, s)
+	})
+
+	t.Run("NestedCreateDelete", func(t *testing.T) {
+		cleanup()
+		storageTestNestedCreateDelete(t, s)
+	})
+
+	t.Run("NestedList", func(t *testing.T) {
+		cleanup()
+		storageTestNestedList(t, s)
+	})
 }
 
 func storageTestCreateDelete(t *testing.T, s storage.Storage) {
@@ -82,6 +98,45 @@ func storageTestWriterReader(t *testing.T, s storage.Storage) {
 func storageTestList(t *testing.T, s storage.Storage) {
 	k := storage.Key("test")
 
+	l, err := s.List()
+	assert.NoError(t, err)
+	assert.Equal(t, 0, len(l))
+
+	w, err := s.Create(k)
+	assert.NoError(t, err)
+
+	err = w.Close()
+	assert.NoError(t, err)
+
+	l, err = s.List()
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(l))
+}
+
+func storageTestNestedCreateDelete(t *testing.T, s storage.Storage) {
+	k := storage.Key("a/b/c/d/test")
+
+	e := s.Exists(k)
+	assert.False(t, e)
+
+	w, err := s.Create(k)
+	assert.NoError(t, err)
+
+	err = w.Close()
+	assert.NoError(t, err)
+
+	_, err = s.Create(k)
+	assert.Error(t, err)
+
+	err = s.Delete(k)
+	assert.NoError(t, err)
+
+	e = s.Exists(k)
+	assert.False(t, e)
+}
+
+func storageTestNestedList(t *testing.T, s storage.Storage) {
+	k := storage.Key("a/b/c/d/test")
 	l, err := s.List()
 	assert.NoError(t, err)
 	assert.Equal(t, 0, len(l))
