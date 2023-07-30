@@ -32,6 +32,14 @@ func (s FilesystemStore) Create(h storage.Key) (io.WriteCloser, error) {
 	}
 
 	pth := filepath.Join(string(s.Root), string(h))
+
+	d := filepath.Dir(pth)
+	if _, err := os.Stat(d); err != nil {
+		if err := os.MkdirAll(d, os.ModePerm); err != nil {
+			return nil, err
+		}
+	}
+
 	return os.Create(pth)
 }
 
@@ -62,15 +70,24 @@ func (s FilesystemStore) Reader(h storage.Key) (io.ReadSeekCloser, error) {
 }
 
 func (s FilesystemStore) List() ([]storage.Key, error) {
-	fs, err := os.ReadDir(string(s.Root))
+	ret := []storage.Key{}
+
+	err := filepath.Walk(string(s.Root), func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		k, err := filepath.Rel(string(s.Root), path)
+		if err != nil {
+			return err
+		}
+		ret = append(ret, storage.Key(k))
+		return nil
+	})
 	if err != nil {
-		return []storage.Key{}, err
-	}
-
-	ret := make([]storage.Key, 0)
-
-	for _, e := range fs {
-		ret = append(ret, storage.Key(e.Name()))
+		return nil, err
 	}
 
 	return ret, nil

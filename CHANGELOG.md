@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Removed
 - Storage server. It belongs in a separate project.
+### Added
+- Support for nested objects in filesystem storage.
 
 ## [0.0.4] - 2023-07-09
 ### Changed
