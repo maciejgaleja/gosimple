@@ -111,6 +111,7 @@ func storageTestList(t *testing.T, s storage.Storage) {
 	l, err = s.List()
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(l))
+	assert.Equal(t, k, l[0])
 }
 
 func storageTestNestedCreateDelete(t *testing.T, s storage.Storage) {
@@ -150,4 +151,5 @@ func storageTestNestedList(t *testing.T, s storage.Storage) {
 	l, err = s.List()
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(l))
+	assert.Equal(t, k, l[0])
 }
