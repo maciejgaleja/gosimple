@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/maciejgaleja/gosimple/pkg/storage"
 	"github.com/maciejgaleja/gosimple/pkg/types"
@@ -79,11 +80,12 @@ func (s FilesystemStore) List() ([]storage.Key, error) {
 		if info.IsDir() {
 			return nil
 		}
-		k, err := filepath.Rel(string(s.Root), path)
+		relPath, err := filepath.Rel(string(s.Root), path)
 		if err != nil {
 			return err
 		}
-		ret = append(ret, storage.Key(k))
+
+		ret = append(ret, storage.Key(normalizePath(filepath.SplitList(relPath))))
 		return nil
 	})
 	if err != nil {
@@ -99,4 +101,8 @@ func (s FilesystemStore) MakeReadOnly(h storage.Key) error {
 	}
 	pth := filepath.Join(string(s.Root), string(h))
 	return os.Chmod(pth, 0400)
+}
+
+func normalizePath(e []string) storage.Key {
+	return storage.Key(strings.Join(e, "/"))
 }

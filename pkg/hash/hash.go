@@ -3,7 +3,6 @@ package hash
 import (
 	"bytes"
 	"crypto/sha512"
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -19,7 +18,7 @@ func Hash(r io.Reader) Sha512 {
 	if err != nil {
 		panic(err)
 	}
-	return Sha512(fmt.Sprintf("%x", h.Sum(nil)))
+	return Sha512(h.Sum(nil))
 }
 
 func HashBytes(d []byte) Sha512 {
