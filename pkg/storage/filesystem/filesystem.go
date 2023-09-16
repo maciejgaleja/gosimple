@@ -60,7 +60,7 @@ func (s FilesystemStore) Writer(h storage.Key) (io.WriteCloser, error) {
 	return os.OpenFile(pth, os.O_WRONLY|os.O_TRUNC, 0644)
 }
 
-func (s FilesystemStore) Reader(h storage.Key) (io.ReadSeekCloser, error) {
+func (s FilesystemStore) Reader(h storage.Key) (io.ReadCloser, error) {
 	if !s.Exists(h) {
 		return nil, fmt.Errorf("object does not exist")
 	}
