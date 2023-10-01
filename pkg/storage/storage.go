@@ -13,6 +13,6 @@ type Storage interface {
 	Create(Key) (io.WriteCloser, error)
 	Delete(Key) error
 	Writer(Key) (io.WriteCloser, error)
-	Reader(Key) (io.ReadSeekCloser, error)
+	Reader(Key) (io.ReadCloser, error)
 	List() ([]Key, error)
 }
