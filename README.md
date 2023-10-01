@@ -21,6 +21,6 @@ If you want to migrate to the cloud or another environment, simply change the im
 
 | Service | Supported backends | Ideas/planned |
 | --- | --- | --- |
-| Storage | Local directory | AWS S3 |
+| Storage | Local directory <br /> AWS S3 | |
 | Key-value store | Local JSON file <br /> NoSQL with primary key | Redis |
 | NoSQL with primary key | AWS DynamoDB | Local JSON file |
