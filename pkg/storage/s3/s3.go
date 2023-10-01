@@ -44,11 +44,7 @@ type ObjectReadCache struct {
 }
 
 func (o *ObjectReadCache) Read(d []byte) (int, error) {
-	n, err := o.d.Read(d)
-	if err == io.EOF {
-		err = nil
-	}
-	return n, err
+	return o.d.Read(d)
 }
 
 func (o *ObjectReadCache) Close() error {
